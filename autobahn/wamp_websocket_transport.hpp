@@ -64,8 +64,24 @@ namespace autobahn {
             const std::string& uri,
             bool debug_enabled = false);
 
+        /*!
+        * Constructs a websocket transport.
+        *
+        * @param uri The remote endpoint to connect to.
+        * @param proxy_uri The proxy endpoint to connect to.
+        */
+        wamp_websocket_transport(
+            const std::string& uri,
+            const std::string& proxy_uri,
+            bool debug_enabled = false);
+
+
         virtual ~wamp_websocket_transport() override = default;
 
+        /*!
+        * Set proxy basic authentication
+        */
+        void set_proxy_basic_auth(const std::string& username, const std::string& password);
 
         /*
         * CONNECTION INTERFACE
@@ -157,10 +173,22 @@ namespace autobahn {
         */
         boost::promise<void> m_disconnect;
 
+        /*!
+        * Websocket proxy URI
+        */
+        std::string m_proxy_uri;
+
+        /*!
+        * Websocket proxy basic authentication username
+        */
+        boost::optional<std::string> m_proxy_username;
+
+        /*!
+        * Websocket proxy basic authentication password
+        */
+        boost::optional<std::string> m_proxy_password;
+
     private:
-
-
-        private:
 
 
             /*!

@@ -70,9 +70,15 @@ namespace autobahn {
             const std::string& uri,
             bool debug_enabled = false);
 
+        wamp_websocketpp_websocket_transport(
+            client_type& client,
+            const std::string& uri,
+            const std::string& proxy_uri,
+            bool debug_enabled = false);
+
         virtual ~wamp_websocketpp_websocket_transport() override;
 
-		virtual bool is_connected() const override;
+        virtual bool is_connected() const override;
 
     private:
         virtual bool is_open() const override;

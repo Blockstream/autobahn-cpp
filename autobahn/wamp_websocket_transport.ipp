@@ -43,13 +43,30 @@ namespace autobahn {
 inline wamp_websocket_transport::wamp_websocket_transport(
     const std::string& uri,
     bool debug_enabled)
+    : wamp_websocket_transport(uri, {}, debug_enabled)
+{
+}
+
+inline wamp_websocket_transport::wamp_websocket_transport(
+    const std::string& uri,
+    const std::string& proxy_uri,
+    bool debug_enabled)
     : wamp_transport()
     , m_connect()
     , m_disconnect()
+    , m_proxy_uri(proxy_uri)
+    , m_proxy_username()
+    , m_proxy_password()
     , m_message_unpacker()
     , m_debug_enabled(debug_enabled)
     , m_uri(uri)
 {
+}
+
+inline void wamp_websocket_transport::set_proxy_basic_auth(const std::string& username, const std::string& password)
+{
+    m_proxy_username = username;
+    m_proxy_password = password;
 }
 
 inline boost::future<void> wamp_websocket_transport::connect()

@@ -40,7 +40,18 @@ namespace autobahn {
         client_type& client,
         const std::string& uri,
         bool debug_enabled)
-        : wamp_websocket_transport(uri, debug_enabled)
+        : wamp_websocketpp_websocket_transport(client, uri, {}, debug_enabled)
+    {
+
+    }
+
+    template <class Config>
+    inline wamp_websocketpp_websocket_transport<Config>::wamp_websocketpp_websocket_transport(
+        client_type& client,
+        const std::string& uri,
+        const std::string& proxy_uri,
+        bool debug_enabled)
+        : wamp_websocket_transport(uri, proxy_uri, debug_enabled)
         , m_client(client)
         , m_hdl()
         , m_open(false)
@@ -124,6 +135,12 @@ namespace autobahn {
             //Log  "Get Connection Error: " + ec.message());
             connect_promise.set_exception(boost::copy_exception(websocketpp::lib::system_error(ec.value(), ec.category(), "connect")));
             return;
+        }
+
+        if (!m_proxy_uri.empty()) {
+            con->set_proxy(m_proxy_uri);
+            if (m_proxy_username.is_initialized() && m_proxy_password.is_initialized())
+                con->set_proxy_basic_auth(*m_proxy_username, *m_proxy_password);
         }
 
         //TODO: need to abstract encoding and get subprotocol
