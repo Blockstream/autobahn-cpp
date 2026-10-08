@@ -221,7 +221,8 @@ inline boost::future<std::string> wamp_session::leave(const std::string& reason)
         }
 
         if (m_goodbye_sent) {
-            m_session_leave.set_exception(boost::copy_exception(protocol_error("goodbye already sent")));
+            // A leave is already in progress and the peer's GOODBYE reply fulfills m_session_leave
+            return;
         }
 
         try {
@@ -886,7 +887,8 @@ inline void wamp_session::process_goodbye(wamp_message&& message)
         goodbye.set_field(1, std::unordered_map<int,int>() /* No Details */);
         goodbye.set_field(2, std::string("wamp.error.goodbye_and_out"));
 
-        send_message(std::move(goodbye));
+        // m_session_id is already 0 here, so the reply must not require an established session
+        send_message(std::move(goodbye), false);
     } else {
         // we previously initiated closing, so this
         // is the peer reply.
