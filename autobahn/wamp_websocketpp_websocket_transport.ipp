@@ -73,7 +73,7 @@ namespace autobahn {
     template <class Config>
     inline wamp_websocketpp_websocket_transport<Config>::~wamp_websocketpp_websocket_transport()
     {
-        
+
     }
 
     template <class Config>
@@ -131,10 +131,10 @@ namespace autobahn {
     template <class Config>
     inline void wamp_websocketpp_websocket_transport<Config>::on_ws_fail(websocketpp::connection_hdl hdl) {
         //Log "Connection failed!");
-        if (!m_open)
+        scoped_lock guard(m_lock);
+        if (!m_open && !m_done)
             m_connect.set_exception(boost::copy_exception(network_error("failed to connect")));
 
-        scoped_lock guard(m_lock);
         m_done = true;
     }
 
