@@ -40,6 +40,15 @@
 
 namespace autobahn {
 
+// Zero memory without the compiler eliding the writes
+inline void secure_zero(void* data, std::size_t size)
+{
+    volatile unsigned char* p = static_cast<volatile unsigned char*>(data);
+    while (size--) {
+        *p++ = 0;
+    }
+}
+
 inline wamp_websocket_transport::wamp_websocket_transport(
     const std::string& uri,
     bool debug_enabled)
@@ -112,6 +121,9 @@ inline void wamp_websocket_transport::send_message(wamp_message&& message)
         std::cerr << "TX message (" << buffer->size() << " octets) ..." << std::endl;
         std::cerr << "TX message: " << message << std::endl;
     }
+
+    // Sent: zero the serialized message, as it can hold credentials
+    secure_zero(buffer->data(), buffer->size());
 }
 
 inline void wamp_websocket_transport::set_pause_handler(pause_handler&& handler)
